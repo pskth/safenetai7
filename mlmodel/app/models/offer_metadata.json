@@ -1,0 +1,21 @@
+{
+  "custom_feature_names": [
+    "has_fee_demand",
+    "payment_demand_score",
+    "urgency_score",
+    "suspicious_link_score",
+    "whatsapp_only_score",
+    "too_good_score",
+    "credential_score",
+    "pressure_score",
+    "legit_score",
+    "message_length",
+    "word_count",
+    "has_email",
+    "exclamation_count",
+    "caps_ratio",
+    "url_count",
+    "phone_count",
+    "scam_signal"
+  ]
+}

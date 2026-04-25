@@ -19,7 +19,7 @@ import {
   PieChart as PieChartIcon,
 } from "lucide-react";
 import Image from "next/image";
-import { type ReactNode, useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -131,6 +131,11 @@ const QUIZ_QUESTIONS = [
 ] as const;
 
 export function DashboardClient({ userName, userEmail, isAdmin }: DashboardClientProps) {
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const [activeSection, setActiveSection] = useState<Section>("detect");
 
   const [linkUrl, setLinkUrl] = useState("");
@@ -296,7 +301,7 @@ export function DashboardClient({ userName, userEmail, isAdmin }: DashboardClien
       date.setDate(date.getDate() - i);
       const key = date.toISOString().slice(0, 10);
       map.set(key, {
-        day: date.toLocaleDateString(undefined, { weekday: "short" }),
+        day: isMounted ? date.toLocaleDateString(undefined, { weekday: "short" }) : "",
         reports: 0,
         evidence: 0,
       });
@@ -421,7 +426,7 @@ export function DashboardClient({ userName, userEmail, isAdmin }: DashboardClien
                   <p className="font-medium text-foreground">{domainScan.data.domain}</p>
                   <StatusBadge status={domainScan.data.status} />
                 </div>
-                <p className="text-sm text-muted-foreground">Created: {domainScan.data.createdAt ? new Date(domainScan.data.createdAt).toLocaleDateString() : "Unknown"}</p>
+                <p className="text-sm text-muted-foreground">Created: {domainScan.data.createdAt ? (isMounted ? new Date(domainScan.data.createdAt).toLocaleDateString() : "") : "Unknown"}</p>
                 <p className="text-sm text-muted-foreground">Age: {domainScan.data.ageYears ? `${domainScan.data.ageYears.toFixed(2)} years` : "Unknown"}</p>
               </ResultPanel>
             )}
@@ -555,7 +560,7 @@ export function DashboardClient({ userName, userEmail, isAdmin }: DashboardClien
                   >
                     <div>
                       <p className="text-sm font-semibold uppercase tracking-wider text-foreground">{scan.type}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{new Date(scan.createdAt).toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{isMounted ? new Date(scan.createdAt).toLocaleString() : ""}</p>
                     </div>
                     <StatusBadge status={scan.status} />
                   </div>
@@ -570,8 +575,8 @@ export function DashboardClient({ userName, userEmail, isAdmin }: DashboardClien
       )}
 
       {activeSection === "reports" && (
-        <section className="grid gap-6 xl:grid-cols-5">
-          <Card className="glass-panel xl:col-span-2 h-fit">
+        <section className="flex flex-col gap-8">
+          <Card className="glass-panel h-fit">
             <CardHeader>
               <CardTitle className="flex items-center gap-2"><AlertTriangle className="size-5 text-accent" /> Self-Reporting System</CardTitle>
               <CardDescription>
@@ -629,7 +634,7 @@ export function DashboardClient({ userName, userEmail, isAdmin }: DashboardClien
             </CardContent>
           </Card>
 
-          <Card className="glass-panel xl:col-span-3">
+          <Card className="glass-panel">
             <CardHeader>
               <CardTitle className="flex items-center gap-2"><Sparkles className="size-5 text-primary" /> Community Reports Feed</CardTitle>
               <CardDescription>Real-time community-impact timeline</CardDescription>
@@ -737,7 +742,7 @@ export function DashboardClient({ userName, userEmail, isAdmin }: DashboardClien
                       </div>
                     </div>
                     <p className="mb-3 text-xs text-muted-foreground">
-                      {new Date(item.createdAt).toLocaleString()} {item.user?.name ? `• by ${item.user.name}` : ""}
+                      {isMounted ? new Date(item.createdAt).toLocaleString() : ""} {item.user?.name ? `• by ${item.user.name}` : ""}
                     </p>
                     <p className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">{item.description}</p>
                     

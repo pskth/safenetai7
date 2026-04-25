@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import email_scan, link_scan, doc_scan, unified_scan
+from app.routers import email_scan, link_scan, doc_scan, unified_scan, offer_scan
 import os
 
 app = FastAPI(
@@ -23,6 +23,7 @@ app.include_router(email_scan.router, prefix="/scan/email", tags=["Email Scan"])
 app.include_router(link_scan.router, prefix="/scan/link",  tags=["Phishing Link Scan"])
 app.include_router(doc_scan.router,  prefix="/scan/doc",   tags=["Document Scan"])
 app.include_router(unified_scan.router, prefix="/scan/unified", tags=["Unified Risk"])
+app.include_router(offer_scan.router,  prefix="/scan/offer",   tags=["Offer Scam Detection"])
 
 
 @app.get("/")

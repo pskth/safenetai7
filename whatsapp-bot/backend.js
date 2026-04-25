@@ -4,7 +4,7 @@ const axios = require("axios");
 const app = express();
 app.use(express.json());
 
-const ML_API_URL = "http://localhost:8000/scan/email/";
+const ML_API_URL = "http://localhost:8000/scan/offer/";
 
 app.post("/api", async (req, res) => {
     const { message, user } = req.body;
@@ -24,23 +24,22 @@ app.post("/api", async (req, res) => {
     try {
         // Send the message to the AI model
         const response = await axios.post(ML_API_URL, {
-            text_content: message,
-            sender_domain: "" // Optional, can extract from message if needed
+            message: message
         });
 
         const data = response.data;
-        const { prediction, confidence, red_flag_words } = data;
+        const { is_offer, prediction, confidence, red_flags } = data;
 
-        if (prediction === "Fake") {
+        if (!is_offer) {
+            reply = "🤖 This message doesn't look like an internship or job offer.\n\nI'm designed to analyze internship and job offer messages for scams. Try sending me a job/internship offer message!";
+        } else if (prediction === "Fake") {
             reply = `⚠️ *SCAM ALERT*\n\nThis offer looks suspiciously like a scam. I am ${confidence}% confident it's fake.\n\n`;
-            
-            if (red_flag_words && red_flag_words.length > 0) {
-                reply += `*Red Flags Found:*\n- ${red_flag_words.join("\n- ")}\n\n`;
+            if (red_flags && red_flags.length > 0) {
+                reply += `*Red Flags Found:*\n- ${red_flags.join("\n- ")}\n\n`;
             }
-            
             reply += "Please do not click on any links or pay any fees. Be safe!";
         } else {
-            reply = `✅ *SAFE*\n\nThis looks like a legitimate offer. I am ${confidence}% confident it's safe. However, always remain cautious and verify the sender!`;
+            reply = `✅ *SAFE*\n\nThis looks like a legitimate offer. I am ${confidence}% confident it's safe. However, always verify the sender's official email and company website before accepting.`;
         }
     } catch (error) {
         console.error("Error communicating with ML API:", error.message);
