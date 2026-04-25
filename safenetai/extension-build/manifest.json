@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "PhishGuard - Link & Email Protection",
-  "version": "2.3",
+  "name": "PhishGuard",
+  "version": "1.0.9",
   "description": "Comprehensive protection against phishing websites and scam emails with AI-powered detection",
   "action": {
     "default_icon": "favicon.ico",

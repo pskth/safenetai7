@@ -1,23 +1,33 @@
 // PhishGuard Popup Script
-document.addEventListener('DOMContentLoaded', function() {
-  // Get DOM elements
-  const statusBadge = document.getElementById('status-badge');
-  const blockedCount = document.getElementById('blocked-count');
-  const scannedCount = document.getElementById('scanned-count');
+document.addEventListener('DOMContentLoaded', async function() {
   const lastUpdate = document.getElementById('last-update');
   const openDashboard = document.getElementById('open-dashboard');
-  const scanCurrentPage = document.getElementById('scan-current-page');
-  const reportPhishing = document.getElementById('report-phishing');
+  const totalDetectedEl = document.getElementById('total-detected');
+  const userReportsEl = document.getElementById('user-reports');
 
   // Load stats from storage
-  chrome.storage.local.get(['blockedCount', 'scannedCount', 'lastUpdate'], function(data) {
-    if (blockedCount) blockedCount.textContent = data.blockedCount || 0;
-    if (scannedCount) scannedCount.textContent = data.scannedCount || 0;
+  chrome.storage.local.get(['lastUpdate'], function(data) {
     if (lastUpdate) {
       const date = data.lastUpdate ? new Date(data.lastUpdate).toLocaleString() : 'Never';
       lastUpdate.textContent = date;
     }
   });
+
+  // Fetch global stats
+  try {
+    const res = await fetch('http://localhost:3000/api/trpc/scan.publicStats');
+    if (res.ok) {
+      const responseBody = await res.json();
+      // tRPC with SuperJSON nests the data under `.json`
+      const stats = responseBody?.result?.data?.json || responseBody?.result?.data;
+      if (stats && totalDetectedEl && userReportsEl) {
+        totalDetectedEl.textContent = stats.totalDetectedGlobal?.toLocaleString() ?? '0';
+        userReportsEl.textContent = stats.userReportsGlobal?.toLocaleString() ?? '0';
+      }
+    }
+  } catch (err) {
+    console.error('Failed to fetch stats:', err);
+  }
 
   // Open dashboard button
   if (openDashboard) {
@@ -25,49 +35,4 @@ document.addEventListener('DOMContentLoaded', function() {
       chrome.tabs.create({ url: 'http://localhost:3000/dashboard' });
     });
   }
-
-  // Scan current page button
-  if (scanCurrentPage) {
-    scanCurrentPage.addEventListener('click', function() {
-      chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-        if (tabs[0]) {
-          const url = tabs[0].url;
-          chrome.tabs.create({ 
-            url: 'http://localhost:3000/link?url=' + encodeURIComponent(url) 
-          });
-        }
-      });
-    });
-  }
-
-  // Report phishing button
-  if (reportPhishing) {
-    reportPhishing.addEventListener('click', function() {
-      chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-        if (tabs[0]) {
-          const url = tabs[0].url;
-          chrome.tabs.create({ 
-            url: 'http://localhost:3000/report?url=' + encodeURIComponent(url) 
-          });
-        }
-      });
-    });
-  }
-
-  // Check extension status
-  chrome.runtime.sendMessage({ action: 'getStatus' }, function(response) {
-    if (chrome.runtime.lastError) {
-      if (statusBadge) {
-        statusBadge.textContent = 'Error';
-        statusBadge.className = 'status-badge error';
-      }
-      return;
-    }
-    if (response && response.active) {
-      if (statusBadge) {
-        statusBadge.textContent = 'Active';
-        statusBadge.className = 'status-badge active';
-      }
-    }
-  });
 });

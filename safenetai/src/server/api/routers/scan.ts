@@ -350,4 +350,16 @@ export const scanRouter = createTRPCRouter({
 
     return scans;
   }),
+
+  publicStats: publicProcedure.query(async ({ ctx }) => {
+    const [totalScans, totalReports] = await Promise.all([
+      ctx.db.scan.count(),
+      ctx.db.report.count(),
+    ]);
+
+    return {
+      totalDetectedGlobal: totalScans,
+      userReportsGlobal: totalReports,
+    };
+  }),
 });
