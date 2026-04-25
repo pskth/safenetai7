@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# Google OAuth secrets — NEVER commit these
+credentials.json
+token.json
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+uv.lock
+
+models/
+data/emails.csv

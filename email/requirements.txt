@@ -1,0 +1,19 @@
+# ── Phase 1 (ingestion layer) ─────────────────────────────────────────────────
+fastapi
+uvicorn[standard]
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+python-dotenv
+
+# ── Phase 2 (security pipeline) ───────────────────────────────────────────────
+dnspython           # SPF TXT record lookups in l1_authentication.py
+beautifulsoup4      # HTML stripping in email_parser.py
+scikit-learn        # TF-IDF + LogisticRegression in l2_nlp.py
+joblib              # Model serialization (save/load .pkl)
+requests            # Misc HTTP calls
+supabase            # Custom college database queries
+
+# Note: VirusTotal threat intel runs via the MCP stdio transport (Node.js subprocess).
+# No Python HTTP client is needed for L3 — mcp_client.py handles JSON-RPC over stdin/stdout.
+# Node.js (for npx) must be installed separately: https://nodejs.org/

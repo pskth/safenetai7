@@ -257,3 +257,4 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+email/frontend/package-lock.json
